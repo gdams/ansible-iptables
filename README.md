@@ -21,7 +21,7 @@ Notice: `firewall_config` should be defined
     - firewall:
         - { name: ssh, port: 22, ip: 0/0 }
         - { name: http, port: 80, ip: 0/0 }
-        - { name: http, port: 443, ip: 0/0 }
+        - { name: https, port: 443, ip: 0/0 }
 
   roles:
     - { role: iptables, firewall_config: "{{ firewall }}" }
