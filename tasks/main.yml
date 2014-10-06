@@ -23,16 +23,36 @@
   always_run: yes
   sudo: true
 
-  # Here we search port in a list, so every comment must have port name.
+- name: Flush rules
+  shell: "{{ item }}"
+  with_items:
+      - /sbin/iptables -F OUTPUT
+      - /sbin/iptables -F INPUT
+
 - name: Set input TCP rules
-  command: /sbin/iptables -I INPUT 1 -p tcp -s {{ item.ip }} --dport {{ item.port }} -j ACCEPT -m comment --comment "{{ item.name }}"
-  when: iptablesrules.stdout.find("http") == -1
+  command: /sbin/iptables -A INPUT -p tcp -s {{ item.ip }} --dport {{ item.port }} -j ACCEPT -m state --state NEW,ESTABLISHED -m comment --comment "{{ item.name }}"
+  #when: iptablesrules.stdout.find({{ item.name }}) == -1
   with_items: firewall
   sudo: true
 
-- name: Allow all output (TODO)
-  command: /sbin/iptables -I OUTPUT -d 0/0 -j ACCEPT
+- name: Allow only current connections
+  shell: "{{ item }}"
+  with_items:
+    - /sbin/iptables -A OUTPUT -o lo -j ACCEPT
+    #- /sbin/iptables -A OUTPUT -m state --state ESTABLISHED -j ACCEPT
+    #- /sbin/iptables -A OUTPUT -j REJECT
+    - /sbin/iptables -A INPUT -i lo -j ACCEPT
+    #- /sbin/iptables -A INPUT -m state --state ESTABLISHED -j ACCEPT
+    - /sbin/iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+    - /sbin/iptables -A INPUT -j REJECT
   sudo: true
+
+#- name: Set unlimited traffic for loopback
+#  shell: /sbin/iptables -A {{ item }} lo -j ACCEPT
+#  with_items:
+#      - "INPUT -i"
+#      - "OUTPUT -o"
+#  sudo: true
 
 - name: Save iptables
   shell: iptables-save > /etc/iptables/rules.v4
@@ -43,5 +63,4 @@
     name: ufw
     state: restarted
   sudo: true
-
 
