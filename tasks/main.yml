@@ -9,6 +9,10 @@
   action: apt name=iptables-persistent state=present
   sudo: true
 
+- name: Install UFW
+  action: apt name=ufw state=present
+  sudo: true
+
 - name: Make sure iptables is started
   service: name=ufw state=started
   sudo: true
