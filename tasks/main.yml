@@ -36,7 +36,7 @@
 - name: Set input TCP rules
   command: /sbin/iptables -A INPUT -p tcp -s {{ item.ip }} --dport {{ item.port }} -j ACCEPT -m state --state NEW,ESTABLISHED -m comment --comment "{{ item.name }}"
   #when: iptablesrules.stdout.find({{ item.name }}) == -1
-  with_items: firewall
+  with_items: "{{firewall}}"
   sudo: true
 
 - name: Allow only current connections
