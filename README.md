@@ -11,7 +11,7 @@ Iptables role for your playbook
 
 Example of playbook
 
-Notice: `firewall_config` should be defined
+Notice: `firewall` should be defined
 
 ```
 - hosts: all
@@ -24,5 +24,5 @@ Notice: `firewall_config` should be defined
         - { name: https, port: 443, ip: 0/0 }
 
   roles:
-    - { role: iptables, firewall_config: "{{ firewall }}" }
+    - { role: iptables }
 ```
