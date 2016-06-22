@@ -3,7 +3,7 @@
 - name: Check if config variable passed
   fail:
     msg: "firewall configuration has not been defined"
-  when: firewall_config|default(False) == False
+  when: firewall|default(False) == False
 
 - name: Install iptables-persistant
   action: apt name=iptables-persistent state=present
