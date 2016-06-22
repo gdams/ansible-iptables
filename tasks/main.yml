@@ -7,25 +7,20 @@
 
 - name: Install iptables-persistant
   action: apt name=iptables-persistent state=present
-  sudo: true
 
 - name: Install UFW
   action: apt name=ufw state=present
-  sudo: true
 
 - name: Make sure iptables is started
   service: name=ufw state=started
-  sudo: true
 
 - name: Make sure iptables-persistent is started
   service: name=iptables-persistent state=started
-  sudo: true
 
 - name: Get iptables rules
   shell: iptables -L
   register: iptablesrules
   always_run: yes
-  sudo: true
 
 - name: Flush rules
   shell: "{{ item }}"
@@ -37,8 +32,7 @@
   command: /sbin/iptables -A INPUT -p tcp -s {{ item.ip }} --dport {{ item.port }} -j ACCEPT -m state --state NEW,ESTABLISHED -m comment --comment "{{ item.name }}"
   #when: iptablesrules.stdout.find({{ item.name }}) == -1
   with_items: "{{firewall}}"
-  sudo: true
-
+  
 - name: Allow only current connections
   shell: "{{ item }}"
   with_items:
@@ -49,22 +43,18 @@
     #- /sbin/iptables -A INPUT -m state --state ESTABLISHED -j ACCEPT
     - /sbin/iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
     - /sbin/iptables -A INPUT -j REJECT
-  sudo: true
-
+  
 #- name: Set unlimited traffic for loopback
 #  shell: /sbin/iptables -A {{ item }} lo -j ACCEPT
 #  with_items:
 #      - "INPUT -i"
 #      - "OUTPUT -o"
-#  sudo: true
 
 - name: Save iptables
   shell: iptables-save > /etc/iptables/rules.v4
-  sudo: true
-
+  
 - name: Restart iptables
   service:
     name: ufw
     state: restarted
-  sudo: true
-
+  
